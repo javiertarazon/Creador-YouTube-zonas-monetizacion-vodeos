@@ -7,7 +7,17 @@ on:
   pull_request:
 
 jobs:
+  runner-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Runner smoke test
+        run: |
+          echo "runner-ok"
+          python --version
+          uname -a
+
   pytest:
+    needs: runner-smoke
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,18 +31,7 @@ jobs:
           python-version: "3.11"
       - name: Install test dependencies
         run: |
-          set -o pipefail
-          python -m pip install --upgrade pip 2>&1 | tee /tmp/install.log
-          pip install "fastapi>=0.115,<1" "pydantic>=2.8,<3" "pydantic-settings>=2.4,<3" "httpx>=0.27,<1" "pytest>=8,<9" "pytest-asyncio>=0.23,<2" 2>&1 | tee -a /tmp/install.log
+          python -m pip install --upgrade pip
+          pip install "fastapi>=0.115,<1" "pydantic>=2.8,<3" "pydantic-settings>=2.4,<3" "httpx>=0.27,<1" "pytest>=8,<9" "pytest-asyncio>=0.23,<2"
       - name: Run tests
-        run: |
-          set -o pipefail
-          pytest -q 2>&1 | tee /tmp/pytest.log
-      - name: Upload diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pytest-diagnostics
-          path: |
-            /tmp/install.log
-            /tmp/pytest.log
+        run: pytest -q
