@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     openai_base_url: str = "https://api.openai.com/v1"
     openai_model: str = "gpt-6-luna"
     model_timeout_seconds: int = 180
+    youtube_api_key: str = ""
+    youtube_trend_results: int = 10
     quality_min_score: float = 8.0
     target_lufs: int = -14
     youtube_auto_publish: bool = False
