@@ -21,7 +21,18 @@ jobs:
           python-version: "3.11"
       - name: Install test dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install "fastapi>=0.115,<1" "pydantic>=2.8,<3" "pydantic-settings>=2.4,<3" "httpx>=0.27,<1" "pytest>=8,<9" "pytest-asyncio>=0.23,<2"
-      - name: Run unit and API tests
-        run: pytest -q
+          set -o pipefail
+          python -m pip install --upgrade pip 2>&1 | tee /tmp/install.log
+          pip install "fastapi>=0.115,<1" "pydantic>=2.8,<3" "pydantic-settings>=2.4,<3" "httpx>=0.27,<1" "pytest>=8,<9" "pytest-asyncio>=0.23,<2" 2>&1 | tee -a /tmp/install.log
+      - name: Run tests
+        run: |
+          set -o pipefail
+          pytest -q 2>&1 | tee /tmp/pytest.log
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-diagnostics
+          path: |
+            /tmp/install.log
+            /tmp/pytest.log
