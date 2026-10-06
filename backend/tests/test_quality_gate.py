@@ -6,10 +6,10 @@ from app.modules.quality_gate import QualityGate
 
 
 @pytest.mark.asyncio
-async def test_quality_gate_passes_nonempty_script():
+async def test_quality_gate_rejects_script_without_media():
     result = await QualityGate().run({"script": "Guion de prueba"})
-    assert result["passed"] is True
-    assert result["score"] >= 8
+    assert result["passed"] is False
+    assert result["score"] < 8
 
 
 @pytest.mark.asyncio
